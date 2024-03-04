@@ -1,14 +1,15 @@
 (*
-For each of the expressions below, check whether it is typed correctly and, if so, provide its type.
-Justify your answer.   
-*)
 
+For each of the expressions below, check whether it is typed correctly and, if so, provide its type.
+Justify your answer.
+
+*)
 
 "foo" ^ 42;
 
 (* Incorrect, 42 isnt a string *)
 
-"foo" ^ string_of_int 42;; 
+"foo" ^ string_of_int 42;;
 
 (* string, "foo42"*)
 
