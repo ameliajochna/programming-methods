@@ -13,9 +13,8 @@ Using these definitions, define the fib_matrix procedure that calculates the kth
 *)
 
 let matrix_mult m n =
-  let a, b, c, d = m in
-  let e, f, g, h = n in
-  (a*e+b*g, a*f+b*h, c*e+d*g, c*f+d*h);;
+  match (m,n) with
+  |((a,b,c,d), (e,f,g,h)) -> (a*e+b*g, a*f+b*h, c*e+d*g, c*f+d*h);;
 
 let matrix_id = (1, 0, 0, 1);;
 

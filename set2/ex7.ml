@@ -8,8 +8,7 @@ let is_sorted xs =
   if xs = [] then true
   else
     let rec check_sorted xs prev =
-      if xs = [] then true
-      else
-        let fst = List.hd xs in
-        ((prev <= fst)) && (check_sorted (List.tl xs) fst)
+      match xs with
+      | [] -> true
+      | head::tail -> ((prev <= head)) && (check_sorted (List.tl xs) head)
     in check_sorted xs (List.hd xs);;

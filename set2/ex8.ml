@@ -6,24 +6,13 @@ You can also think of this procedure as returning a permutation of the list xs i
 
 *)
 
-let select xs =
-  let rec minimum_val xs min_val =
-    match xs with
-    | [] -> min_val
-    | head::tail ->
-      if head < min_val then minimum_val tail head
-      else minimum_val tail min_val
-  in
-  let rec remove_minimum xs min_val =
-    match xs with
-    | [] -> []
-    | head::tail ->
-      if min_val = head then tail
-      else head :: remove_minimum tail min_val
-  in
-  let calc_min = minimum_val xs (List.hd xs)
-  in
-  (calc_min, remove_minimum xs calc_min);;
+let rec select xs =
+  match xs with
+  | [] -> failwith "empty list"
+  | [x] -> (x, [])
+  | x::xss -> let t = select xss in
+    if x < fst t then (x, xss)
+    else (fst t, xss);;
 
 let rec select_sort xs =
   if xs = [] then []
