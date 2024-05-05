@@ -36,7 +36,6 @@ let rec subst (x : ident) (s : expr) (e : expr) : expr =
   | Let (y, e1, e2) -> if x = y
                          then Let (y, subst x s e1, e2)
                          else Let (y, subst x s e1, subst x s e2)
-  | Sum(y, e1, e2, e3) -> Sum (y, subst x s e1, subst x s e2, subst x s e3)
   | _ -> e
 
 let expr_of_value (v : value) : expr =
@@ -67,33 +66,16 @@ let rec eval (e : expr) : value =
   | Let (x, e1, e2) -> let s = expr_of_value (eval e1) in
                        eval (subst x s e2)
   | Var x -> failwith ("unbound value " ^ x)
-  | Sum (x, e1, e2, e3) ->
-    let rec calc_sum cur_pt max_pt acc =
-      if eval(Binop(Eq, cur_pt, max_pt)) = VBool(true) then Binop(Add, acc, expr_of_value(eval(subst x cur_pt e3)))
-      else calc_sum (Binop(Add, cur_pt, Int(1))) max_pt (Binop(Add, acc, expr_of_value(eval(subst x cur_pt e3))))
-    in eval(calc_sum e1 e2 (Int(0)))
-
-
+  | _ -> failwith("error")
 
 let interp (s : string) : value =
   eval (parse s)
-
-(* let closed (e : expr) : bool =
-  let rec check_if_closed exp vars =
-    match exp with
-    | Int _ -> true
-    | Bool _ -> true
-    | Var x -> List.mem x vars
-    | Binop(_, e1, e2) -> check_if_closed e1 vars && check_if_closed e2 vars
-    | If(e1, e2, e3) -> check_if_closed e1 vars && check_if_closed e2 vars && check_if_closed e3 vars
-    | Let (x, e1, e2) -> check_if_closed e1 (x::vars) && check_if_closed e2 (x::vars)
-  in check_if_closed e [];; *)
 
 end
 
 
 (* Evaluation via environments *)
-(*
+
 module Env = struct
 
 module M = Map.Make(String)
@@ -128,10 +110,27 @@ let rec eval_env (env : env) (e : expr) : value =
       (match M.find_opt x env with
       | Some v -> v
       | None -> failwith ("unbound value" ^ x))
+  | _ -> failwith("error")
 
 let eval : expr -> value = eval_env M.empty
 
 let interp (s : string) : value =
   eval (parse s)
 
-end *)
+type env2 = ident M.t
+let rec rename_expr (e : expr) (nazwa : string) (env : env2): expr =
+  match e with
+  | Binop(op,e1,e2) -> Binop(op,(rename_expr e1 (nazwa^"0") env),(rename_expr e2 (nazwa^"1") env))
+  | Let(x, e1, e2) -> Let(nazwa, rename_expr e1 (nazwa^"7") env, rename_expr e2 (nazwa^"2") (M.add x nazwa env))
+  | Var x ->
+    (match M.find_opt x env with
+      | Some v -> Var v
+      | None -> Var x)
+  | If(e1,e2,e3) -> If(rename_expr e1 (nazwa^"4") env, rename_expr e2 (nazwa^"5") env, rename_expr e3 (nazwa^"6") env)
+  | _ -> e
+
+let rename_expr_2 (e:expr) : expr =
+  rename_expr e "#" M.empty;;
+
+
+end
